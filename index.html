@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>لوحة تحكم الشيف 🔐</title>
+    <title>لوحة التحكم الشيف 🔐</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -212,6 +213,11 @@
             transform: none;
         }
 
+        .btn-map {
+            background: #1976d2;
+            color: white;
+        }
+
         .badge-points {
             color: #f5c842;
             font-weight: bold;
@@ -297,6 +303,30 @@
             background: #dc3545;
         }
 
+        /* ===== Filters ===== */
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #f5c842;
+            background: rgba(245, 200, 66, 0.1);
+            color: #f5c842;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: .3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(245, 200, 66, 0.25);
+            color: white;
+        }
+
         @media (max-width: 700px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -311,6 +341,9 @@
             .btn-sm {
                 font-size: 11px;
                 padding: 4px 8px;
+            }
+            .filters {
+                justify-content: center;
             }
         }
     </style>
@@ -339,6 +372,22 @@
             <div class="stat-card">
                 <div class="num" id="rewardUsers">0</div>
                 <div class="label">🎁 وجبات مجانية</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="totalLocations">0</div>
+                <div class="label">📍 إجمالي المواقع</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="todayLocations">0</div>
+                <div class="label">📅 مواقع اليوم</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="androidUsers">0</div>
+                <div class="label">📱 اندرويد</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="iphoneUsers">0</div>
+                <div class="label">🍎 آيفون</div>
             </div>
         </div>
 
@@ -439,6 +488,39 @@
                 </div>
             </div>
 
+            <!-- ===== CLIENTS LOCATIONS ===== -->
+            <div class="box">
+                <h3>📍 مواقع الزبائن</h3>
+
+                <input type="text" id="locationSearch" placeholder="🔍 بحث حسب التاريخ أو الجهاز أو المتصفح">
+
+                <div class="filters">
+                    <button class="filter-btn active" onclick="setLocationFilter('all')">الكل</button>
+                    <button class="filter-btn" onclick="setLocationFilter('today')">اليوم</button>
+                    <button class="filter-btn" onclick="setLocationFilter('7days')">آخر 7 أيام</button>
+                    <button class="filter-btn" onclick="setLocationFilter('30days')">آخر 30 يوم</button>
+                </div>
+
+                <div class="user-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الوقت</th>
+                                <th>خط العرض</th>
+                                <th>خط الطول</th>
+                                <th>الخرائط</th>
+                                <th>المتصفح</th>
+                                <th>الجهاز</th>
+                            </tr>
+                        </thead>
+                        <tbody id="locationsBody">
+                            <tr><td colspan="7">⏳ جارِ التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div><!-- end grid -->
 
         <a href="index.html" class="back-link">⬅️ رجوع للموقع</a>
@@ -465,7 +547,8 @@
             orderBy,
             getDoc,
             getFirestore,
-            increment
+            increment,
+            where
         } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
@@ -845,8 +928,125 @@
             document.addEventListener("keydown", unlockOnce);
         }
 
+        // =============================================
+        // ===== 9. مواقع الزبائن =====
+        // =============================================
+
+        let allLocations = [];
+        let currentFilter = 'all';
+
+        window.setLocationFilter = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderLocations();
+        };
+
+        document.getElementById('locationSearch').addEventListener('input', renderLocations);
+
+        function loadLocations() {
+            const q = query(collection(db, "locations"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    document.getElementById("locationsBody").innerHTML = `<tr><td colspan="7">📭 لا توجد مواقع زبائن متاحة</td></tr>`;
+                    allLocations = [];
+                    updateLocationStats();
+                    return;
+                }
+
+                allLocations = [];
+                snapshot.forEach((docSnap) => {
+                    const loc = docSnap.data();
+                    allLocations.push({
+                        id: docSnap.id,
+                        date: loc.date || '',
+                        time: loc.time || '',
+                        latitude: loc.latitude || 0,
+                        longitude: loc.longitude || 0,
+                        browser: loc.browser || 'غير معروف',
+                        device: loc.device || 'غير معروف',
+                        timestamp: loc.timestamp || Date.now()
+                    });
+                });
+                renderLocations();
+            }, (error) => {
+                console.error("خطأ في جلب المواقع:", error);
+                document.getElementById("locationsBody").innerHTML = `<tr><td colspan="7">❌ خطأ: ${error.message}</td></tr>`;
+            });
+        }
+
+        function renderLocations() {
+            const searchTerm = document.getElementById('locationSearch').value.toLowerCase();
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+            let filtered = allLocations.filter(loc => {
+                const matchesSearch =
+                    loc.date.toLowerCase().includes(searchTerm) ||
+                    loc.device.toLowerCase().includes(searchTerm) ||
+                    loc.browser.toLowerCase().includes(searchTerm);
+
+                if (!matchesSearch) return false;
+
+                if (currentFilter === 'today') {
+                    return loc.timestamp >= todayStart;
+                } else if (currentFilter === '7days') {
+                    return loc.timestamp >= todayStart - 7 * 24 * 60 * 60 * 1000;
+                } else if (currentFilter === '30days') {
+                    return loc.timestamp >= todayStart - 30 * 24 * 60 * 60 * 1000;
+                }
+                return true;
+            });
+
+            const tbody = document.getElementById("locationsBody");
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7">📭 لا توجد نتائج</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(loc => `
+                <tr>
+                    <td>${loc.date}</td>
+                    <td>${loc.time}</td>
+                    <td>${loc.latitude.toFixed(6)}</td>
+                    <td>${loc.longitude.toFixed(6)}</td>
+                    <td>
+                        <button class="btn-sm btn-map" onclick="openInGoogleMaps(${loc.latitude}, ${loc.longitude})">📍 خرائط</button>
+                    </td>
+                    <td>${loc.browser}</td>
+                    <td>${loc.device}</td>
+                </tr>
+            `).join('');
+
+            updateLocationStats();
+        }
+
+        window.openInGoogleMaps = function(lat, lng) {
+            window.open(`https://maps.google.com/?q=${lat},${lng}`, '_blank');
+        };
+
+        function updateLocationStats() {
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+            const total = allLocations.length;
+            const today = allLocations.filter(l => l.timestamp >= todayStart).length;
+            const android = allLocations.filter(l => l.device.toLowerCase().includes('android')).length;
+            const iphone = allLocations.filter(l => l.device.toLowerCase().includes('iphone') || l.device.toLowerCase().includes('ios')).length;
+
+            document.getElementById("totalLocations").textContent = total;
+            document.getElementById("todayLocations").textContent = today;
+            document.getElementById("androidUsers").textContent = android;
+            document.getElementById("iphoneUsers").textContent = iphone;
+        }
+
+        loadLocations();
+
         console.log("✅ Admin panel loaded with Carte Fidélité system!");
     </script>
 
 </body>
 </html>
+```
