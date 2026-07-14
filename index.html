@@ -1110,18 +1110,59 @@ onSnapshot(collection(db, "categories"), (snapshot) => {
 
         const data = doc.data();
 
-        list.innerHTML += `
-            <div style="
-                padding:12px;
-                margin:8px 0;
-                background:#222;
-                border-radius:10px;
-                color:#fff;
-                border:1px solid #555;
-            ">
-                📂 ${data.name}
-            </div>
-        `;
+     list.innerHTML += `
+<div style="
+    margin:20px 0;
+    padding:20px;
+    border:2px solid #ffcc33;
+    border-radius:15px;
+    background:#1b1b1b;
+">
+
+<h3 style="color:#ffcc33;margin-bottom:15px;">
+📂 ${data.name}
+</h3>
+
+<input
+id="productName-${doc.id}"
+placeholder="اسم المنتج"
+style="width:100%;margin:6px 0;padding:10px;">
+
+<input
+id="productPrice-${doc.id}"
+type="number"
+placeholder="السعر"
+style="width:100%;margin:6px 0;padding:10px;">
+
+<textarea
+id="productDescription-${doc.id}"
+placeholder="الوصف"
+style="width:100%;margin:6px 0;padding:10px;"></textarea>
+
+<input
+id="productImage-${doc.id}"
+placeholder="رابط الصورة"
+style="width:100%;margin:6px 0;padding:10px;">
+
+<button
+onclick="addProduct('${doc.id}')"
+style="
+width:100%;
+margin-top:10px;
+padding:12px;
+background:#ffcc33;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+">
+➕ إضافة منتج
+</button>
+
+<div id="products-${doc.id}" style="margin-top:20px;"></div>
+
+</div>
+`;
 
     });
 
