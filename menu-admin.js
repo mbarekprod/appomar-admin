@@ -36,3 +36,81 @@ window.addCategory = async function () {
     input.value = "";
 
 };
+// =========================
+// AFFICHAGE DES CATEGORIES
+// =========================
+
+function loadCategories(){
+
+    const list = document.getElementById("categoriesList");
+
+    if(!list) return;
+
+
+    const q = query(
+        categoriesRef,
+        orderBy("createdAt","asc")
+    );
+
+
+    onSnapshot(q, (snapshot)=>{
+
+        list.innerHTML = "";
+
+
+        snapshot.forEach((cat)=>{
+
+            const data = cat.data();
+
+
+            list.innerHTML += `
+
+            <div style="
+                background:#222;
+                padding:15px;
+                margin:10px 0;
+                border-radius:12px;
+                border:1px solid #ffcc33;
+            ">
+
+                <h3 style="color:#ffcc33">
+                    📂 ${data.name}
+                </h3>
+
+
+                <button onclick="deleteCategory('${cat.id}')">
+                    🗑️ حذف
+                </button>
+
+
+            </div>
+
+            `;
+
+
+        });
+
+
+    });
+
+}
+
+
+loadCategories();
+
+
+// =========================
+// SUPPRIMER CATEGORIE
+// =========================
+
+window.deleteCategory = async function(id){
+
+    if(!confirm("حذف هذا الصنف؟"))
+        return;
+
+
+    await deleteDoc(
+        doc(db,"categories",id)
+    );
+
+};
