@@ -418,6 +418,9 @@
             <!-- ===== MENU ===== -->
             <div class="box">
                 <h3>🍽️ تحديث قائمة اليوم</h3>
+         
+
+</div>
 
                 <input type="text" id="food1" placeholder="أكلة 1">
                 <input type="text" id="price1" placeholder="السوم">
@@ -431,6 +434,26 @@
                     📢 إرسال إشعار للزبائن
                 </button>
             </div>
+        
+               <div class="box">
+
+    <h3>📚 إدارة المنيو الكامل</h3>
+
+    <input id="categoryName" placeholder="اسم الصنف">
+
+    <button onclick="addCategory()">
+        ➕ إضافة صنف
+    </button>
+
+    <hr style="margin:20px 0;">
+
+    <div id="categoriesList">
+
+        ⏳ جاري تحميل الأصناف...
+
+    </div>
+                   </div>
+                   
 
             <!-- ===== WHEEL SETTINGS ===== -->
             <div class="box">
@@ -1045,6 +1068,64 @@
         loadLocations();
 
         console.log("✅ Admin panel loaded with Carte Fidélité system!");
+        // =========================
+// GESTION DES CATEGORIES
+// =========================
+
+window.addCategory = async function () {
+
+    const input = document.getElementById("categoryName");
+    const name = input.value.trim();
+
+    if (name === "") {
+        alert("أدخل اسم الصنف");
+        return;
+    }
+
+    try {
+
+        await addDoc(collection(db, "categories"), {
+            name: name,
+            createdAt: Date.now()
+        });
+
+        input.value = "";
+
+    } catch (err) {
+
+        console.error(err);
+        alert("حدث خطأ");
+
+    }
+
+};
+
+onSnapshot(collection(db, "categories"), (snapshot) => {
+
+    const list = document.getElementById("categoriesList");
+
+    list.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+
+        const data = doc.data();
+
+        list.innerHTML += `
+            <div style="
+                padding:12px;
+                margin:8px 0;
+                background:#222;
+                border-radius:10px;
+                color:#fff;
+                border:1px solid #555;
+            ">
+                📂 ${data.name}
+            </div>
+        `;
+
+    });
+
+});
     </script>
 
 </body>
