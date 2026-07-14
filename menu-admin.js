@@ -114,3 +114,40 @@ window.deleteCategory = async function(id){
     );
 
 };
+window.addProduct = async function(categoryId, categoryName){
+
+    const name = document.getElementById(`productName-${categoryId}`).value.trim();
+
+    const price = document.getElementById(`productPrice-${categoryId}`).value;
+
+    const description = document.getElementById(`productDescription-${categoryId}`).value;
+
+    const image = document.getElementById(`productImage-${categoryId}`).value;
+
+
+    if(!name || !price){
+        alert("أدخل اسم المنتج والسعر");
+        return;
+    }
+
+
+    await addDoc(collection(db,"products"),{
+
+        categoryId: categoryId,
+        categoryName: categoryName,
+
+        name:name,
+        price:price,
+
+        description:description,
+        image:image,
+
+        createdAt:Date.now()
+
+    });
+
+
+    alert("✅ تمت إضافة المنتج");
+
+
+};
