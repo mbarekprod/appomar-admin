@@ -1,4 +1,7 @@
+
 import { db } from "./firebase.js";
+console.log("DB =", db);
+console.log("ADMIN LOADED");
 import {
   collection,
   addDoc,
