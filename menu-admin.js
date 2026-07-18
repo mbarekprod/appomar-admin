@@ -13,7 +13,10 @@ import {
   orderBy,
   where
 } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-alert("MENU ADMIN LOADED");
+
+document.body.style.border = "10px solid red";
+alert("JS WORKING");
+
 const categoriesRef = collection(db, "categories");
 const productsRef = collection(db, "products");
 const variantsRef = collection(db, "variants");
