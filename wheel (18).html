@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>عجلة الحظ - الفنان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="wheel.css"/>
+</head>
+<body>
+
+  <audio id="bgMusic" loop>
+    <source src="sanfara.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="bg"></div>
+
+  <!-- Sparks -->
+  <div class="spark" style="left:5%;animation-duration:9s;animation-delay:0s"></div>
+  <div class="spark" style="left:14%;animation-duration:13s;animation-delay:1.5s"></div>
+  <div class="spark" style="left:24%;animation-duration:11s;animation-delay:2s"></div>
+  <div class="spark" style="left:37%;animation-duration:8s;animation-delay:4s"></div>
+  <div class="spark" style="left:50%;animation-duration:14s;animation-delay:0.5s"></div>
+  <div class="spark" style="left:62%;animation-duration:10s;animation-delay:3s"></div>
+  <div class="spark" style="left:73%;animation-duration:12s;animation-delay:1s"></div>
+  <div class="spark" style="left:83%;animation-duration:9s;animation-delay:5s"></div>
+  <div class="spark" style="left:91%;animation-duration:11s;animation-delay:2.5s"></div>
+  <div class="spark" style="left:96%;animation-duration:8s;animation-delay:6s"></div>
+
+  <!-- Floating stars -->
+  <div class="star" style="left:8%;bottom:-20px;animation-duration:10s;animation-delay:0s;font-size:16px">⭐</div>
+  <div class="star" style="left:20%;bottom:-20px;animation-duration:11.5s;animation-delay:1.3s;font-size:22px">✨</div>
+  <div class="star" style="left:32%;bottom:-20px;animation-duration:13s;animation-delay:2.6s;font-size:16px">🌟</div>
+  <div class="star" style="left:44%;bottom:-20px;animation-duration:14.5s;animation-delay:3.9s;font-size:22px">💫</div>
+  <div class="star" style="left:56%;bottom:-20px;animation-duration:16s;animation-delay:5.2s;font-size:16px">⭐</div>
+  <div class="star" style="left:68%;bottom:-20px;animation-duration:17.5s;animation-delay:6.5s;font-size:22px">✨</div>
+  <div class="star" style="left:80%;bottom:-20px;animation-duration:19s;animation-delay:7.8s;font-size:16px">🌟</div>
+  <div class="star" style="left:92%;bottom:-20px;animation-duration:20.5s;animation-delay:9.1s;font-size:22px">💫</div>
+
+  <!-- Confetti container -->
+  <div id="confetti-container"></div>
+
+  <!-- Wheel -->
+  <div class="wheel-wrapper">
+    <div class="pointer">▼</div>
+    <canvas id="wheel" width="500" height="500"></canvas>
+    <div class="center-logo">
+      <img src="735043823_122232458936380788_691619389420209673_n (3).jpg" alt="Logo"/>
+    </div>
+  </div>
+
+  <!-- Prediction / prize selection -->
+  <div class="prediction-title">🎯 حط التوكن على الجايزة إلي تحس بيها قبل ما تدوّر:</div>
+  <div class="prize-buttons" id="prizeButtons">
+    <!-- Buttons are generated automatically from the prizes list in wheel.js -->
+  </div>
+
+  <button class="spin-btn" id="spinBtn" disabled>🔥 دوّر العجلة</button>
+  <div id="result"></div>
+
+  <!-- Full-screen "bet locked" robot reveal — plays once per prize selection -->
+  <div class="robot-overlay" id="robotOverlay">
+    <svg class="robot-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="robotHeadClip">
+          <circle cx="100" cy="40" r="24"/>
+        </clipPath>
+      </defs>
+
+      <!-- Skeleton made of "wire" lines -->
+      <circle class="part-head" cx="100" cy="40" r="26" pathLength="1"/>
+      <line class="part-neck" x1="100" y1="66" x2="100" y2="80" pathLength="1"/>
+      <rect class="part-torso" x="55" y="80" width="90" height="95" rx="14" pathLength="1"/>
+      <polyline class="part-arm-l" points="55,95 25,112 20,152" pathLength="1"/>
+      <polyline class="part-arm-r" points="145,95 175,112 180,152" pathLength="1"/>
+      <polyline class="part-leg-l" points="75,175 65,228 60,254" pathLength="1"/>
+      <polyline class="part-leg-r" points="125,175 135,228 140,254" pathLength="1"/>
+
+      <!-- "Code" circuit traces on the torso -->
+      <line class="part-circuit" x1="68"  y1="100" x2="132" y2="100" pathLength="1"/>
+      <line class="part-circuit" x1="68"  y1="120" x2="108" y2="120" pathLength="1"/>
+      <line class="part-circuit" x1="92"  y1="140" x2="132" y2="140" pathLength="1"/>
+      <rect class="part-circuit" x="84" y="106" width="12" height="8" pathLength="1"/>
+      <rect class="part-circuit" x="104" y="126" width="12" height="8" pathLength="1"/>
+
+      <!-- Floating code glyphs -->
+      <text class="code-flicker" x="18"  y="70">01</text>
+      <text class="code-flicker" x="165" y="60">&lt;/&gt;</text>
+      <text class="code-flicker" x="20"  y="200">10</text>
+      <text class="code-flicker" x="160" y="210">{ }</text>
+
+      <!-- The artist logo becomes the robot's head -->
+      <image class="robot-head-img"
+             href="735043823_122232458936380788_691619389420209673_n (3).jpg"
+             x="76" y="16" width="48" height="48"
+             clip-path="url(#robotHeadClip)"
+             preserveAspectRatio="xMidYMid slice"/>
+      <circle class="part-head-ring" cx="100" cy="40" r="24"/>
+    </svg>
+  </div>
+
+  <script type="module" src="wheel.js"></script>
+</body>
+</html>
