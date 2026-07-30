@@ -47,7 +47,6 @@
   </nav>
   <div class="sidebar-footer">
     <span class="admin-email" id="adminEmail"></span>
-    <button class="back-btn" id="logoutBtn" onclick="doLogout()" style="cursor:pointer;border:none;width:100%;">🚪 تسجيل الخروج</button>
   </div>
 </aside>
 
@@ -433,9 +432,6 @@
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- Full page not shown until auth confirms this is the chef -->
-<script>document.documentElement.style.visibility = "hidden";</script>
-<script type="module" src="auth-guard.js"></script>
 <script type="module" src="app.js"></script>
 </body>
 </html>
