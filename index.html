@@ -46,7 +46,8 @@
     </a>
   </nav>
   <div class="sidebar-footer">
-    <a href="index.html" class="back-btn">⬅️ رجوع للموقع</a>
+    <span class="admin-email" id="adminEmail"></span>
+    <button class="back-btn" id="logoutBtn" onclick="doLogout()" style="cursor:pointer;border:none;width:100%;">🚪 تسجيل الخروج</button>
   </div>
 </aside>
 
@@ -88,7 +89,7 @@
         <div class="stat-icon">🎁</div>
         <div class="stat-info">
           <span class="stat-value" id="statFreeMeals">0</span>
-          <span class="stat-label">وجبات مجانية</span>
+          <span class="stat-label">وجبات مجانية مستحقة</span>
         </div>
       </div>
       <div class="stat-card stat-purple">
@@ -198,7 +199,7 @@
     <div class="dash-card">
       <div class="table-wrapper">
         <table class="data-table">
-          <thead><tr><th>الزبون</th><th>⭐ النقاط</th><th>🎁 الوجبات المجانية</th><th>التحكم</th></tr></thead>
+          <thead><tr><th>الزبون</th><th>⭐ النقاط</th><th>🎁 مستحق؟</th><th>التحكم</th></tr></thead>
           <tbody id="loyaltyBody"><tr><td colspan="4" class="loading-cell">⏳ جارِ التحميل...</td></tr></tbody>
         </table>
       </div>
@@ -222,6 +223,7 @@
         </div>
       </div>
       <button class="btn btn-gold btn-block" onclick="saveWheelSchedule()">⏰ حفظ توقيت العجلة</button>
+      <p class="section-desc" style="margin-top:10px;">⚠️ هذا التوقيت محفوظ فـ Firestore (settings/wheelSchedule)، باش يخدم فعلياً على صفحة العجلة (wheel.html) لازم تربطها بقراءة هذا التوقيت.</p>
     </div>
   </section>
 
@@ -238,6 +240,16 @@
       <div class="form-group">
         <label>📝 التفاصيل</label>
         <textarea id="eventDescription" class="form-input" rows="3" placeholder="تفاصيل الإيفينمون..."></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>📅 التاريخ</label>
+          <input type="date" id="eventDate" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>⏰ الوقت</label>
+          <input type="time" id="eventTime" class="form-input">
+        </div>
       </div>
       <div class="form-group">
         <label>🖼️ رابط الصورة</label>
@@ -265,8 +277,8 @@
     <div class="dash-card">
       <div class="table-wrapper">
         <table class="data-table">
-          <thead><tr><th>التاريخ</th><th>الوقت</th><th>خط العرض</th><th>خط الطول</th><th>الخرائط</th><th>المتصفح</th><th>الجهاز</th></tr></thead>
-          <tbody id="locationsBody"><tr><td colspan="7" class="loading-cell">⏳ جارِ التحميل...</td></tr></tbody>
+          <thead><tr><th>التاريخ</th><th>الوقت</th><th>الخرائط</th><th>الجهاز</th><th>المتصفح</th></tr></thead>
+          <tbody id="locationsBody"><tr><td colspan="5" class="loading-cell">⏳ جارِ التحميل...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -278,6 +290,10 @@
       <h2>📢 إرسال إشعار للزبائن</h2>
     </div>
     <div class="dash-card">
+      <p class="section-desc">
+        📌 كتابة إشعار هنا تسجّل نسخة فـ Firestore (للأرشيف)، لكن باش الإشعار يوصل فعلياً كـ Push Notification
+        للزبائن، لازم ترسله من Firebase Console (رابط الزر تحت) لأن الإرسال الحقيقي يحتاج Cloud Function من جهة السيرفر.
+      </p>
       <div class="form-group">
         <label>📝 عنوان الإشعار</label>
         <input type="text" id="notifTitle" class="form-input" placeholder="عنوان الإشعار">
@@ -286,7 +302,8 @@
         <label>💬 نص الإشعار</label>
         <textarea id="notifBody" class="form-input" rows="4" placeholder="نص الإشعار..."></textarea>
       </div>
-      <button class="btn btn-gold btn-block" onclick="sendNotification()">📢 إرسال الإشعار</button>
+      <button class="btn btn-gold btn-block" onclick="sendNotification()">💾 تسجيل الإشعار</button>
+      <button class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="openNotificationPanel()">📢 فتح Firebase Console للإرسال الفعلي</button>
     </div>
   </section>
 
@@ -346,7 +363,7 @@
         </div>
         <div class="form-group">
           <label>💱 العملة</label>
-          <input type="text" id="productCurrency" class="form-input" placeholder="د.ج" value="د.ج">
+          <input type="text" id="productCurrency" class="form-input" placeholder="د" value="د">
         </div>
       </div>
       <div class="form-group">
@@ -416,6 +433,9 @@
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module" src="menu-admin.js"></script>
+<!-- Full page not shown until auth confirms this is the chef -->
+<script>document.documentElement.style.visibility = "hidden";</script>
+<script type="module" src="auth-guard.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
