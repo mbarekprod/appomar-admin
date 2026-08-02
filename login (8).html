@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دخول الشيف 🔐</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+body{
+  background:#1a0a00;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+.card{
+  width:100%;
+  max-width:360px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid #f5c842;
+  border-radius:20px;
+  padding:34px 30px;
+  text-align:center;
+}
+h1{color:#f5c842;font-size:26px;margin-bottom:8px;}
+p.sub{color:#aaa;font-size:14px;margin-bottom:22px;}
+input{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #555;
+  background:#2a1a0a;
+  color:white;
+  font-family:'Cairo';
+  font-size:22px;
+  text-align:center;
+  letter-spacing:6px;
+}
+input::placeholder{color:#888;font-size:15px;letter-spacing:normal;}
+button{
+  width:100%;
+  margin-top:14px;
+  padding:13px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(135deg,#ff9800,#e65100);
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{transform:scale(1.02);}
+.msg{
+  min-height:20px;
+  margin-top:12px;
+  font-size:14px;
+  font-weight:600;
+  color:#ff6b6b;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>👨‍🍳 لوحة تحكم الشيف</h1>
+  <p class="sub">حط الكود السري باش تدخل</p>
+
+  <input type="password" id="code" placeholder="•••••" inputmode="numeric" maxlength="10" autocomplete="off">
+
+  <button onclick="checkCode()">دخول</button>
+  <div class="msg" id="msg"></div>
+</div>
+
+<script>
+// ===== غيّر الكود السري هنا (بين القوسين) =====
+const ADMIN_CODE = "fannen2026";
+
+// إذا كان ديجا داخل من قبل (فتحة نفس المتصفح) → روحو مباشرة
+if (sessionStorage.getItem("chefAuth") === "ok") {
+    window.location.href = "index.html";
+}
+
+function checkCode() {
+    const input = document.getElementById("code").value.trim();
+    const msg = document.getElementById("msg");
+
+    if (input === ADMIN_CODE) {
+        sessionStorage.setItem("chefAuth", "ok");
+        window.location.href = "index.html";
+    } else {
+        msg.textContent = "❌ الكود غالط، عاود جرب";
+        document.getElementById("code").value = "";
+    }
+}
+
+document.getElementById("code").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") checkCode();
+});
+</script>
+
+</body>
+</html>
