@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>قائمة مطعم الفنان</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Cairo',sans-serif;
+
+background:
+
+linear-gradient(
+rgba(0,0,0,.82),
+rgba(0,0,0,.82)
+),
+
+url('unnamed (2).jpg');
+
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+background-attachment:fixed;
+
+min-height:100vh;
+
+padding:30px 15px;
+
+overflow-x:hidden;
+}
+
+/* CONTAINER */
+
+.container{
+
+max-width:500px;
+
+margin:auto;
+
+animation:fade .8s ease;
+}
+
+@keyframes fade{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/* LOGO */
+
+.logo{
+
+width:160px;
+height:160px;
+
+border-radius:50%;
+
+overflow:hidden;
+
+border:4px solid #ffcc33;
+
+margin:auto;
+margin-bottom:20px;
+
+box-shadow:
+0 0 20px #ffcc33,
+0 0 50px rgba(255,204,51,.5);
+
+animation:pulse 3s infinite;
+}
+
+.logo img{
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+}
+
+@keyframes pulse{
+
+0%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.05);
+}
+
+100%{
+transform:scale(1);
+}
+
+}
+
+/* TITLES */
+
+.title{
+
+text-align:center;
+
+font-size:42px;
+
+font-weight:900;
+
+color:#ffcc33;
+
+text-shadow:
+0 0 15px rgba(255,204,51,.7);
+
+margin-bottom:10px;
+}
+
+.subtitle{
+
+text-align:center;
+
+color:white;
+
+margin-bottom:30px;
+
+font-size:15px;
+
+letter-spacing:2px;
+}
+
+/* CARD */
+
+.card{
+
+background:
+rgba(0,0,0,.65);
+
+padding:25px;
+
+border-radius:30px;
+
+border:2px solid #ffcc33;
+
+backdrop-filter:blur(8px);
+
+box-shadow:
+0 0 40px rgba(255,204,51,.2);
+}
+
+/* MENU ITEM */
+
+.item{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:18px;
+
+margin:12px 0;
+
+border-radius:18px;
+
+background:
+rgba(255,255,255,.05);
+
+border:
+1px solid rgba(255,204,51,.2);
+
+transition:.3s;
+}
+
+.item:hover{
+
+transform:scale(1.03);
+
+background:
+rgba(255,204,51,.1);
+
+border-color:#ffcc33;
+}
+
+.left{
+
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.emoji{
+
+font-size:28px;
+}
+
+.name{
+
+color:white;
+
+font-size:20px;
+
+font-weight:700;
+}
+
+.price{
+
+color:#ffcc33;
+
+font-size:20px;
+
+font-weight:900;
+}
+
+/* BACK */
+
+.back{
+
+display:block;
+
+margin-top:25px;
+
+text-align:center;
+
+text-decoration:none;
+
+color:#ffcc33;
+
+font-size:18px;
+
+transition:.3s;
+}
+
+.back:hover{
+
+transform:scale(1.05);
+}
+
+/* MOBILE */
+
+@media(max-width:500px){
+
+.title{
+
+font-size:34px;
+}
+
+.name{
+
+font-size:17px;
+}
+
+.price{
+
+font-size:17px;
+}
+
+.logo{
+
+width:135px;
+height:135px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+<source src="sanfara.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+
+<div class="logo">
+
+<img src="735043823_122232458936380788_691619389420209673_n (3).jpg">
+
+</div>
+
+<div class="title">
+
+قائمة الفنان
+
+</div>
+
+<div class="subtitle">
+
+🔥 أكلاتنا اليومية 🔥
+
+</div>
+
+<div class="card" id="menu-card">
+
+<div class="item" id="menu-loading">
+
+<div class="left">
+
+<div class="name">⏳ جارِ تحميل المنيو...</div>
+
+</div>
+
+</div>
+
+</div>
+
+<a
+href="index.html"
+class="back">
+
+⬅️ الرجوع للرئيسية
+
+</a>
+
+</div>
+
+<script type="module">
+import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+import { db } from "./firebase.js";
+
+function renderMenu(snapshot) {
+    const card = document.getElementById("menu-card");
+    if (snapshot.empty) {
+        card.innerHTML = '<div class="item"><div class="left"><div class="name">📭 المنيو فارغ حالياً</div></div></div>';
+        return;
+    }
+    let html = "";
+    snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        html += `
+            <div class="item">
+                <div class="left">
+                    <div class="emoji">${item.emoji || "🍽️"}</div>
+                    <div class="name">${item.name || ""}</div>
+                </div>
+                <div class="price">${item.price || ""}</div>
+            </div>
+        `;
+    });
+    card.innerHTML = html;
+}
+
+const q = query(collection(db, "menuItems"), orderBy("createdAt", "asc"));
+onSnapshot(q, renderMenu, (error) => {
+    console.error("مشكلة في جلب المنيو:", error);
+    document.getElementById("menu-card").innerHTML = `<div class="item"><div class="left"><div class="name">❌ خطأ: ${error.message}</div></div></div>`;
+});
+</script>
+
+<script>
+const music = document.getElementById("bgMusic");
+music.volume = 0.5;
+
+function applySavedTime(){
+    try{
+        const savedTime = localStorage.getItem("musicTime");
+        if (savedTime && music.readyState > 0) {
+            music.currentTime = parseFloat(savedTime);
+        }
+    } catch(e){}
+}
+
+if (music.readyState > 0) {
+    applySavedTime();
+} else {
+    music.addEventListener("loadedmetadata", applySavedTime);
+}
+
+setInterval(() => {
+    try { localStorage.setItem("musicTime", music.currentTime); } catch(e){}
+}, 1000);
+
+try {
+    const muted = localStorage.getItem("musicMuted");
+    if (muted === "true") { music.muted = true; }
+} catch(e){}
+
+function startMusic() {
+    music.play().catch(() => {});
+}
+
+window.addEventListener("load", startMusic);
+startMusic();
+
+function unlockOnce() {
+    startMusic();
+    document.removeEventListener("click", unlockOnce);
+    document.removeEventListener("touchstart", unlockOnce);
+    document.removeEventListener("scroll", unlockOnce);
+    document.removeEventListener("keydown", unlockOnce);
+}
+
+document.addEventListener("click", unlockOnce);
+document.addEventListener("touchstart", unlockOnce);
+document.addEventListener("scroll", unlockOnce);
+document.addEventListener("keydown", unlockOnce);
+</script>
+
+</body>
+</html>

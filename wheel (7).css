@@ -1,0 +1,444 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  overflow-x: hidden;
+  color: white;
+  position: relative;
+  direction: rtl;
+  background: #111;
+  padding-bottom: 40px;
+}
+
+/* Background */
+.bg {
+  position: fixed; inset: -5%; z-index: -2;
+  background:
+    linear-gradient(rgba(0,0,0,.80),rgba(0,0,0,.80)),
+    url('unnamed (2).jpg');
+  background-size: cover; background-position: center;
+  animation: bgZoom 22s ease-in-out infinite alternate;
+}
+.bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(255,140,0,.32), transparent 62%);
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+@keyframes bgZoom {
+  0%   { transform: scale(1)    translate(0,0);     }
+  100% { transform: scale(1.15) translate(-2%,-1%); }
+}
+@keyframes pulse { 0% { opacity:.3; } 100% { opacity:1; } }
+
+/* Sparks */
+.spark {
+  position: fixed; bottom: -20px; width: 6px; height: 6px;
+  border-radius: 50%; background: #ffcc33;
+  box-shadow: 0 0 12px #ff7b00; z-index: -1; opacity: 0;
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0%   { transform: translateY(0)      scale(1);  opacity: 0; }
+  10%  { opacity: .9; }
+  100% { transform: translateY(-110vh) scale(.3); opacity: 0; }
+}
+
+/* Floating stars */
+.star {
+  position: fixed; opacity: 0; z-index: -1;
+  animation: floatStar linear infinite;
+}
+@keyframes floatStar {
+  0%   { transform: translateY(0)      rotate(0deg)   scale(1);  opacity: 0; }
+  15%  { opacity: .7; }
+  85%  { opacity: .5; }
+  100% { transform: translateY(-100vh) rotate(360deg) scale(.4); opacity: 0; }
+}
+
+/* Wheel wrapper */
+.wheel-wrapper {
+  position: relative; width: 380px; height: 380px;
+  display: flex; justify-content: center; align-items: center;
+}
+.pointer {
+  position: absolute; top: -22px; font-size: 55px; z-index: 99;
+  color: #ff1e1e; filter: drop-shadow(0 0 8px black);
+  animation: glow 1s infinite alternate;
+}
+#wheel {
+  width: 100%; height: 100%; border-radius: 50%;
+  border: 10px solid #ffcc33; background: #111;
+  box-shadow: 0 0 20px rgba(255,204,51,.8), 0 0 50px rgba(255,136,0,.5);
+  transition: transform 6s cubic-bezier(.17,.67,.12,.99);
+}
+.center-logo {
+  position: absolute; width: 115px; height: 115px; border-radius: 50%;
+  background: #fff; border: 6px solid #ffcc33; z-index: 50; overflow: hidden;
+  display: flex; justify-content: center; align-items: center;
+  animation: logoPulse 2.5s ease-in-out infinite;
+}
+.center-logo img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes logoPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(255,204,51,.6); }
+  50%      { box-shadow: 0 0 35px rgba(255,204,51,1), 0 0 55px rgba(255,123,0,.6); }
+}
+@keyframes glow {
+  from { filter: drop-shadow(0 0 5px #fff);    }
+  to   { filter: drop-shadow(0 0 20px #ffcc33); }
+}
+
+/* =========================================================
+   PRIZE SELECTION AREA (new)
+   ========================================================= */
+.prediction-title {
+  margin-top: 26px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffcc33;
+  text-shadow: 0 0 10px rgba(255,204,51,.6);
+  text-align: center;
+}
+
+.prize-buttons {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 620px;
+  padding: 0 16px;
+}
+
+.prize-btn {
+  --prize-color: #ffcc33;
+  position: relative;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid var(--prize-color);
+  border-radius: 16px;
+  padding: 16px 16px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(2px);
+  overflow: visible;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.prize-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: rgba(255,255,255,0.14);
+  box-shadow: 0 4px 14px rgba(0,0,0,.4), 0 0 12px var(--prize-color);
+}
+
+.prize-btn:active {
+  transform: translateY(-1px) scale(.98);
+}
+
+.prize-btn.selected {
+  background: var(--prize-color);
+  color: #111;
+  border-color: #fff;
+  box-shadow: 0 0 18px var(--prize-color), 0 0 36px var(--prize-color);
+  animation: selectPop .35s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.prize-label { pointer-events: none; }
+
+@keyframes selectPop {
+  0%   { transform: scale(1);    }
+  40%  { transform: scale(1.15); }
+  70%  { transform: scale(.96);  }
+  100% { transform: scale(1);    }
+}
+
+/* ---- Betting chip (artist logo) — drops onto the tile like a Crazy Time token ---- */
+.chip-token {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffcc33;
+  box-shadow: 0 0 10px rgba(255,204,51,.9), 0 3px 6px rgba(0,0,0,.5);
+  opacity: 0;
+  transform: translate(-50%, -40px) scale(0);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.chip-token.chip-drop {
+  animation: chipDrop .55s cubic-bezier(.34,1.56,.64,1) forwards,
+             chipGlow 1.4s ease-in-out .55s infinite alternate;
+}
+
+@keyframes chipDrop {
+  0%   { transform: translate(-50%, -46px) scale(0);    opacity: 0; }
+  55%  { transform: translate(-50%, 6px)   scale(1.25); opacity: 1; }
+  75%  { transform: translate(-50%, -4px)  scale(.95);  opacity: 1; }
+  100% { transform: translate(-50%, 0)     scale(1);    opacity: 1; }
+}
+
+@keyframes chipGlow {
+  from { box-shadow: 0 0 10px rgba(255,204,51,.9), 0 3px 6px rgba(0,0,0,.5); }
+  to   { box-shadow: 0 0 18px rgba(255,204,51,1), 0 0 26px rgba(255,123,0,.7), 0 3px 6px rgba(0,0,0,.5); }
+}
+
+/* ---- "Bet locked" curtain sweep — closes then reopens over the tile ---- */
+.curtain-wrap {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.curtain-l, .curtain-r {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: repeating-linear-gradient(135deg, #1a1a1a 0 6px, #2a2a2a 6px 12px);
+  transform: scaleX(0);
+  opacity: 0;
+}
+.curtain-l { left: 0;  transform-origin: left center;  border-right: 2px solid #ffcc33; }
+.curtain-r { right: 0; transform-origin: right center; border-left: 2px solid #ffcc33; }
+
+.prize-btn.locking .curtain-l,
+.prize-btn.locking .curtain-r {
+  animation: curtainSweep .9s ease .5s both;
+}
+
+@keyframes curtainSweep {
+  0%   { transform: scaleX(0); opacity: 0;   }
+  8%   { opacity: .97; }
+  40%  { transform: scaleX(1); opacity: .97; }
+  65%  { transform: scaleX(1); opacity: .97; }
+  100% { transform: scaleX(0); opacity: 0;   }
+}
+
+.lock-icon {
+  position: absolute;
+  top: 50%; left: 50%;
+  font-size: 18px;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.4);
+  z-index: 5;
+}
+
+.prize-btn.locking .lock-icon {
+  animation: lockPop .9s ease .5s both;
+}
+
+@keyframes lockPop {
+  0%, 38%  { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
+  48%      { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  60%      { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+  78%,100% { opacity: 0; transform: translate(-50%, -50%) scale(.6);  }
+}
+
+/* =========================================================
+   FULL-SCREEN ROBOT REVEAL — plays once per prize selection.
+   A wireframe "code skeleton" draws itself, then the artist
+   logo settles in as its head.
+   ========================================================= */
+.robot-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(0,0,0,.55), rgba(0,0,0,.9));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 400;
+  transition: opacity .25s ease;
+}
+.robot-overlay.show { opacity: 1; }
+
+.robot-svg {
+  width: min(58vw, 300px);
+  height: auto;
+  overflow: visible;
+}
+
+.robot-svg [class^="part-"] {
+  fill: none;
+  stroke: #ffcc33;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px rgba(255,204,51,.8));
+}
+
+.robot-svg .part-circuit {
+  stroke: #4CAF50;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 5px rgba(76,175,80,.9));
+}
+
+.robot-svg .part-head-ring {
+  fill: none;
+  stroke: #ffcc33;
+  stroke-width: 3;
+  opacity: 0;
+}
+
+.robot-overlay.show .part-head    { animation: drawShape .35s ease-out .05s forwards; }
+.robot-overlay.show .part-neck    { animation: drawShape .20s ease-out .30s forwards; }
+.robot-overlay.show .part-torso   { animation: drawShape .35s ease-out .40s forwards; }
+.robot-overlay.show .part-arm-l   { animation: drawShape .30s ease-out .60s forwards; }
+.robot-overlay.show .part-arm-r   { animation: drawShape .30s ease-out .65s forwards; }
+.robot-overlay.show .part-leg-l   { animation: drawShape .30s ease-out .70s forwards; }
+.robot-overlay.show .part-leg-r   { animation: drawShape .30s ease-out .75s forwards; }
+.robot-overlay.show .part-circuit { animation: drawShape .25s ease-out .90s forwards; }
+.robot-overlay.show .part-head-ring { animation: fadeIn .2s ease-out .50s forwards; }
+
+@keyframes drawShape { to { stroke-dashoffset: 0; } }
+@keyframes fadeIn { to { opacity: 1; } }
+
+.robot-head-img {
+  opacity: 0;
+  transform-origin: 100px 40px;
+  transform: scale(.4);
+}
+.robot-overlay.show .robot-head-img {
+  animation: headPop .3s ease-out .5s forwards;
+}
+@keyframes headPop {
+  0%   { opacity: 0; transform: scale(.4); }
+  70%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.robot-overlay.show .robot-svg {
+  animation: robotGlowPulse .4s ease-out 1.0s;
+}
+@keyframes robotGlowPulse {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(255,204,51,.5)); }
+  50%      { filter: drop-shadow(0 0 26px rgba(255,204,51,1)) drop-shadow(0 0 40px rgba(76,175,80,.7)); }
+}
+
+.code-flicker {
+  font-family: 'Cairo', monospace;
+  font-size: 13px;
+  fill: #4CAF50;
+  opacity: 0;
+}
+.robot-overlay.show .code-flicker { animation: codeFlicker 1.4s ease-in-out forwards; }
+.code-flicker:nth-of-type(1) { animation-delay: .10s; }
+.code-flicker:nth-of-type(2) { animation-delay: .30s; }
+.code-flicker:nth-of-type(3) { animation-delay: .50s; }
+.code-flicker:nth-of-type(4) { animation-delay: .70s; }
+@keyframes codeFlicker {
+  0%, 100% { opacity: 0;   }
+  10%,20%  { opacity: .8;  }
+  30%      { opacity: .2;  }
+  45%,55%  { opacity: .9;  }
+  70%      { opacity: .3;  }
+  85%      { opacity: .7;  }
+}
+
+@media (max-width: 500px) {
+  .robot-svg { width: min(70vw, 240px); }
+}
+
+/* ---- Wheel locked by admin ---- */
+.prize-buttons.wheel-locked .prize-btn {
+  opacity: .4;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(.6);
+}
+
+.locked-msg {
+  display: none;
+  margin-top: 16px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  background: rgba(220, 53, 69, .18);
+  border: 2px solid #dc3545;
+  color: #ff8a8a;
+  font-weight: 900;
+  font-size: 15px;
+  text-align: center;
+  max-width: 90%;
+}
+
+.locked-msg.show {
+  display: block;
+  animation: selectPop .35s ease both;
+}
+
+/* Spin button */
+.spin-btn {
+  margin-top: 26px; padding: 15px 50px; border: none; border-radius: 50px;
+  font-size: 22px; font-weight: 900; cursor: pointer; font-family: 'Cairo', sans-serif;
+  background: linear-gradient(45deg, #ff1e1e, #ff7b00); color: white;
+  box-shadow: 0 0 24px rgba(255,87,34,.8); transition: .3s;
+  position: relative; overflow: hidden;
+}
+.spin-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);
+  transform: translateX(-100%);
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(200%); } }
+.spin-btn:hover:not(:disabled) { transform: scale(1.08); box-shadow: 0 0 35px rgba(255,87,34,1); }
+.spin-btn:disabled { opacity:.5; cursor:not-allowed; }
+.spin-btn:disabled::after { display:none; }
+
+/* Result */
+#result {
+  margin-top: 18px; font-size: 28px; font-weight: 900;
+  min-height: 44px; color: #ffcc33;
+  text-shadow: 0 0 14px rgba(255,204,51,.9);
+  text-align: center;
+  padding: 0 20px;
+}
+#result.win  { color: #4CAF50; text-shadow: 0 0 14px rgba(76,175,80,.9); }
+#result.lose { color: #ff5252; text-shadow: 0 0 14px rgba(255,82,82,.9); }
+
+.result-show { animation: resultBounce .6s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes resultBounce {
+  0%,100% { transform: scale(1);   }
+  20%     { transform: scale(1.3); }
+  40%     { transform: scale(.9);  }
+  60%     { transform: scale(1.1); }
+  80%     { transform: scale(.97); }
+}
+
+/* Confetti */
+.confetti-piece {
+  position: fixed; top: -10px; border-radius: 3px; opacity: 0; z-index: 999;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0)      rotate(0deg)   scaleX(1);  opacity: 1; }
+  80%  { opacity: .8; }
+  100% { transform: translateY(105vh)  rotate(720deg) scaleX(.3); opacity: 0; }
+}
+
+@media (max-width: 500px) {
+  .wheel-wrapper { width: 300px; height: 300px; }
+  .center-logo { width: 90px; height: 90px; border-width: 5px; }
+  .spin-btn { font-size: 20px; padding: 13px 32px; }
+  #result { font-size: 22px; }
+  .prize-btn { font-size: 12.5px; padding: 14px 13px 8px; }
+  .prediction-title { font-size: 16px; }
+  .chip-token { width: 22px; height: 22px; top: -13px; }
+}
